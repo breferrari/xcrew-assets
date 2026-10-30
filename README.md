@@ -5,8 +5,10 @@ The images [xcrew](https://github.com/breferrari/xcrew)'s README shows, and the 
 | File | What it is |
 |---|---|
 | `banner.svg`, `band.svg`, `test-result.svg`, `failures-pane.svg`, `architecture.svg` and their `-light` twins | What `mockups.py` draws: the banner, embedding `screw.png`, and the mockups in its frame and colours |
-| `icon.svg`, `social-preview.svg` | The icon and the repository's social preview, drawn by hand |
+| `icon.svg` | The plugin's icon, drawn by hand: `screw.png` large on a dark rounded tile, so the orange X is what reads at small sizes |
+| `social-preview.svg` | The repository's social preview, drawn by hand |
 | `screw.png` | The screw the banner shows |
+| `icon.png` | `icon.svg` rendered at its own 1024×1024, the file xcrew ships as its plugin icon |
 | Each other `.png` | The SVG of the same name, rendered at 2x |
 
 Each picture the README shows has a dark version and a `-light` twin, so the README shows it in the reader's theme.
@@ -23,7 +25,11 @@ for f in banner band test-result failures-pane architecture; do
 done
 ```
 
-Render a hand-drawn SVG the same way after editing it.
+Render a hand-drawn SVG the same way after editing it, except the icon, which stays at its own size:
+
+```sh
+rsvg-convert -w 1024 -h 1024 icon.svg -o icon.png
+```
 
 ## How xcrew uses it
 
