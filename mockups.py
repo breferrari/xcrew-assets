@@ -237,12 +237,16 @@ def arch():
     backdrop(c, W, H)
     sans = "Helvetica Neue"
 
+    # A subtitle of several lines takes 18 more for each line past the first.
     def box(x, y, w, h, title, sub=None, accent=None, fill=None):
+        subs = [sub] if isinstance(sub, str) else (sub or [])
+        h += 18 * max(len(subs) - 1, 0)
         c.add(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="6" fill="{fill or C["term"]}" stroke="{accent or C["border"]}" stroke-width="{1.6 if accent else 1}"/>')
-        ty = y + (h / 2 + 6 if not sub else h / 2 - 4)
+        ty = y + (h / 2 + 6 if not subs else h / 2 - 4 - 9 * (len(subs) - 1))
         c.text(x + 18, ty, title, "text", "600", size=17, font=FONT)
-        if sub:
-            c.text(x + 18, ty + 22, sub, "subtle", size=14, font=FONT)
+        for i, line in enumerate(subs):
+            c.text(x + 18, ty + 22 + 18 * i, line, "subtle", size=14, font=FONT)
+        return h
 
     def line(x1, y1, x2, y2, arrow=True, dash=False):
         d = ' stroke-dasharray="5 5"' if dash else ""
@@ -258,14 +262,16 @@ def arch():
     pieces = [
         ("plugin.json", "MobileBuildMCP · Xcode MCP · Sosumi", False),
         ("hooks.json", "session briefing", True),
-        ("mod (TypeScript)", "guard · timing · band · pane · /xcrew", True),
+        ("mod (TypeScript)", ["guard · timing · band · pane · /xcrew", "ledger · setup form · look · affected"], True),
         ("skills/", "setup · reference", True),
     ]
     px, pw, ph = 330, 470, 64
+    middles = []
     for i, (title, sub, cli) in enumerate(pieces):
-        py = 100 + i * 92
-        elbow(250, 285, px - 4, py + ph / 2)
-        box(px, py, pw, ph, title, sub)
+        py = 100 + i * 92 + (9 if i == 3 else 0)
+        h = box(px, py, pw, ph, title, sub)
+        middles.append(py + h / 2)
+        elbow(250, 285, px - 4, py + h / 2)
     c.text(px, 92, "THE PLUGIN", "label", "600", size=12, font=sans, spacing="2")
     # The servers the plugin starts.
     sx = 860
@@ -273,11 +279,10 @@ def arch():
     line(px + pw, 132, sx - 4, 132)
     # The Swift CLI everything else calls.
     cy = 470
-    box(860, cy, 384, 80, "Swift CLI (bin/xcrew)", "report · phase · project · doctor · setup", accent=C["success"])
+    ch = box(860, cy, 384, 80, "Swift CLI (bin/xcrew)", ["setup · doctor · why · affected · graph", "look · space · concurrency · xcode", "report · phase · project · runs · note"], accent=C["success"])
     for i in (1, 2, 3):
-        py = 100 + i * 92 + ph / 2
-        c.add(f'<path d="M{px + pw} {py} H830 V{cy + 26} H856" stroke="#6e7681" stroke-width="1.4" fill="none" marker-end="url(#arrow)"/>')
-    c.text(870, cy + 112, "built from source on first use, once per version", "subtle", size=13, font=sans)
+        c.add(f'<path d="M{px + pw} {middles[i]} H830 V{cy + 26} H856" stroke="#6e7681" stroke-width="1.4" fill="none" marker-end="url(#arrow)"/>')
+    c.text(870, cy + ch + 26, "built from source on first use, once per version", "subtle", size=13, font=sans)
     # mcs, the other way in.
     box(330, 486, pw, 64, "mcs techpack", "configure.sh · one script per doctor check", fill=C["bar"])
     line(px + pw, 518, 856, 518)
